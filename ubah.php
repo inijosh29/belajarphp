@@ -1,14 +1,27 @@
 <?php
-    include_once("koneksi.php");
+include_once("koneksi.php");
 
-    $id = $_GET["id"];
+$id = $_GET["id"];
 
-    $getData = mysqli_query($conn, "select * from books where id = $id");
-    $books = mysqli_fetch_assoc($getData);
+$getData = mysqli_query($conn, "select * from books where id = $id");
+$books = mysqli_fetch_assoc($getData);
 
-    if (isset($_POST["submit"])) {
-        // ini untuk menyimpan data kedalam variablle
+if (isset($_POST["ubah"])) {
+    // ini untuk menyimpan data kedalam variablle
+    $judul = htmlspecialchars($_POST["judul"]);
+    $gambar = $_FILES["gambar"]["name"];
+    $keterangan = htmlspecialchars($_POST["keterangan"]);
+    $kategori = $_POST["kategori"];
+
+    // query
+    $query = "UPDATE books SET judul = '$judul', gambar = '$gambar', keterangan = '$keterangan', kategori = '$kategori' where id = $id";
+
+    mysqli_query($conn, $query);
+
+    if (mysqli_affected_rows($conn) > 0) {
+        header("Location: index.php");
     }
+}
 ?>
 <!doctype html>
 <html lang="en">
@@ -76,22 +89,26 @@
                 <form action="" method="POST" enctype="multipart/form-data">
                     <div class="mb-5">
                         <label for="judul" class="form-label"> Judul buku</label>
-                        <input type="text" class="form-control" name="judul" id="judul" placeholder="Isi judul buku anda" value="<?= $books["judul"]; ?>" required>
+                        <input type="text" class="form-control" name="judul" id="judul" placeholder="Isi judul buku anda" value="<?= $books["judul"]; ?>">
                     </div>
 
                     <div class="mb-5">
                         <label for="judul" class="form-label">Upload Gambar</label>
-                        <input type="file" class="form-control" name="gambar" id="judul" required>
+                        <input type="file" class="form-control" name="gambar" id="judul" value="<?= $books["gambar"]; ?>">
+                        <p><?= $books["gambar"]; ?></p>
                     </div>
 
                     <div class="mb-5">
                         <label for="Isi" class="form-label">Isi keterangan</label>
-                        <textarea class="form-control" id="keterangan" name="keterangan" rows="3" required></textarea>
+                        <textarea class="form-control" id="keterangan" name="keterangan" rows="3">
+                            <?= $books["keterangan"]; ?>
+                        </textarea>
                     </div>
 
                     <div class="mb-5">
                         <label for="kategori" class="form-label">Kategori</label>
-                        <select name="kategori" id="kategori" class="form-select" required>
+                        <select name="kategori" id="kategori" class="form-select">
+                            <option value="<?= $books["kategori"]; ?>" hidden><?= $books["kategori"]; ?></option>
                             <option value="Coding">Coding</option>
                             <option value="Design">Design</option>
                             <option value="Personal">Personal</option>
@@ -99,7 +116,7 @@
                     </div>
 
                     <a href="index.php" class="btn btn-outline-secondary btn-lg">Back</a>
-                    <button type="submit" name="simpan" class="btn btn-outline-success btn-lg col-4">Simpan</button>
+                    <button type="submit" name="ubah" class="btn btn-outline-success btn-lg col-4">ubah</button>
 
                 </form>
             </div>
