@@ -1,11 +1,29 @@
 <?php
-    include_once("koneksi.php");
+include_once("koneksi.php");
 
-    $books = [];
-    $queryBook = mysqli_query($conn,"select * from books");
-    while($book = mysqli_fetch_assoc($queryBook)){
+$books = [];
+// $queryBook = mysqli_query($conn,"select * from books");
+// while($book = mysqli_fetch_assoc($queryBook)){
+//     $books[] = $book;
+// }
+
+if (isset($_POST["search"])) {
+    $search = htmlspecialchars($_POST["searchPost"]);
+
+    $queryBook = mysqli_query($conn, "SELECT * FROM books 
+                                        WHERE judul LIKE '%$search%' 
+                                        OR kategori LIKE '%$search%'");
+
+    while ($book = mysqli_fetch_assoc($queryBook)) {
         $books[] = $book;
     }
+} else {
+    // If no search is performed, you can display all blog posts here.
+    $queryBook = mysqli_query($conn, "select * from books");
+    while ($book = mysqli_fetch_assoc($queryBook)) {
+        $books[] = $book;
+    }
+}
 ?>
 
 
@@ -56,9 +74,9 @@
                         <a class="nav-link disabled">Disabled</a>
                     </li>
                 </ul>
-                <form class="d-flex" role="search">
-                    <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
-                    <button class="btn btn-outline-success" type="submit">Search</button>
+                <form class="d-flex" role="search" action="" method="POST">
+                    <input name="searchPost" class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
+                    <button name="search" btn btn-outline-success" type="submit">Search</button>
                 </form>
             </div>
         </div>
@@ -81,17 +99,17 @@
             </thead>
             <tbody>
                 <?php foreach ($books as $buku) : ?>
-                <tr>
-                   <td> <?= $buku["judul"]; ?></td>
-                   <td> <?= $buku["gambar"];?></td>
-                   <td> <?= $buku["keterangan"];?></td>
-                   <td> <?= $buku["kategori"];?></td>
-                   <td>
-                   <a href="hapus.php?id=<?= $buku['id'] ?>" onclick="return confirm('Apakah Anda yakin ingin menghapus buku ini?')" class="btn btn-danger delete-btn">Delete</a>
-                   <a href="ubah.php?id=<?php echo $buku["id"]; ?>" class="btn btn-primary">edit</a>
-                   </td>
-                   
-                </tr>
+                    <tr>
+                        <td> <?= $buku["judul"]; ?></td>
+                        <td> <?= $buku["gambar"]; ?></td>
+                        <td> <?= $buku["keterangan"]; ?></td>
+                        <td> <?= $buku["kategori"]; ?></td>
+                        <td>
+                            <a href="hapus.php?id=<?= $buku['id'] ?>" onclick="return confirm('Apakah Anda yakin ingin menghapus buku ini?')" class="btn btn-danger delete-btn">Delete</a>
+                            <a href="ubah.php?id=<?php echo $buku["id"]; ?>" class="btn btn-primary">edit</a>
+                        </td>
+
+                    </tr>
                 <?php endforeach; ?>
             </tbody>
         </table>
